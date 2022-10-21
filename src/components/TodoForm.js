@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 
-function TodoForm(props) {
-  const [input, setInput] = useState(props.edit ? props.edit.value : "")
+function TodoForm({
+  onSubmit = ({ id, text }) => null,
+  defaultValue = ""
+}) {
+  const [input, setInput] = useState(defaultValue)
 
   const inputRef = useRef(null)   // function that focuses on input 
+
   useEffect(() => {
     inputRef.current.focus()
   })
@@ -14,7 +18,7 @@ function TodoForm(props) {
 
   const handleSubmit = e => {
     e.preventDefault()  // does not allow refresh the page 
-    props.onSubmit({
+    onSubmit({
       id: Math.floor(Math.random() * 10000),  // creates object with id
       text: input,
     })
@@ -24,9 +28,37 @@ function TodoForm(props) {
 
   return (
     <form className='todo-form' onSubmit={handleSubmit}>
-      {props.edit ? (<><input type='text' placeholder='Update your item' value={input} name='text' className='todo-input edit' onChange={handleChange} ref={inputRef} /><button className='todo-button edit'>Update</button></>)
+      {defaultValue ?
+        (<>
+          <input
+            type='text'
+            placeholder='Update your item'
+            value={input}
+            name='text'
+            className='todo-input edit'
+            onChange={handleChange}
+            ref={inputRef}
+          />
+          <button className='todo-button edit'>
+            Update
+          </button>
+        </>)
         :
-        (<><input type='text' placeholder='Add todo' value={input} name='text' className='todo-input' onChange={handleChange} ref={inputRef} /><button className='todo-button'>Add ToDo</button></>)}
+        (<>
+          <input
+            type='text'
+            placeholder='Add todo'
+            value={input}
+            name='text'
+            className='todo-input'
+            onChange={handleChange}
+            ref={inputRef}
+          />
+          <button className='todo-button'>
+            Add ToDo
+          </button>
+        </>)
+      }
     </form>
   )
 }

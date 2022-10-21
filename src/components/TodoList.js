@@ -6,45 +6,96 @@ function TodoList() {
 
   const [todos, setTodos] = useState([])
 
-  const addTodo = todo => {
-    if (!todo || /^\s*$/.test(todo.text)) {   // regex checks the spaces
+  const addTodo = ({ id, text }) => {
+    const todo = {
+      id,
+      text: text.trim(),
+      isComplete: false,
+    }
+    if (!todo.text) {   // regex checks the spaces
       return;
     }
     const newTodos = [todo, ...todos]  // adding cutrent todo to the list
     setTodos(newTodos)
   }
 
-  const updateTodo = (todoId, newValue) => {
-    if (!newValue || /^\s*$/.test(newValue.text)) {   // regex checks the spaces
+  const updateTodo = ({
+    id,
+    text,
+    isComplete
+  }) => {
+    const newValue = {
+      id,
+      text: text.trim(),
+      isComplete,
+    }
+    if (!newValue.text) {   // regex checks the spaces
       return;
     }
-    setTodos(prev => prev.map(item => (item.id === todoId ? newValue : item)))
-  }
+    setTodos(prev => {
+      const newTodos = prev.map(item => {
+        if (item.id === id) return newValue;
+        return item;
+      });
 
+      return newTodos;
+    })
+  }
 
   const removeTodo = (id) => {
-    let removeArr = [...todos].filter((todo) => todo.id !== id)
-    setTodos(removeArr)
+    setTodos(prev => prev.filter(todo => todo.id !== id))
   }
 
-
   const completeTodo = id => {
-    let updatedTodos = todos.map((todo) => {
-      if (todo.id === id) {
-        todo.isComplete = !todo.isComplete
-      }
-      return todo;
-    })
-    setTodos(updatedTodos)
+    setTodos(prev => {
+      return prev.map((todo) => {
+        if (todo.id === id) {
+          return {
+            ...todo,
+            isComplete: !todo.isComplete
+          }
+        }
+        return todo;
+      });
+    });
   }
 
   return (
     <div>
       <h1>Whats the plan for today?</h1>
-      <TodoForm onSubmit={addTodo} />
-      <Todo todos={todos} completeTodo={completeTodo} removeTodo={removeTodo} updateTodo={updateTodo} />
+      <TodoForm
+        onSubmit={addTodo}
+      />
+      <div>
+        {todos.map(item => (
+          <Todo
+            key={item.id}
+            todo={item}
+            completeTodo={() => completeTodo(item.id)}
+            removeTodo={() => removeTodo(item.id)}
+            updateTodo={updateTodo}
+          />
+        ))}
+      </div>
     </div>
   )
+
+  // return div({
+  //   children: [
+  //     h1({
+  //       children: 'Whats the plan for today?'
+  //     }),
+  //     TodoForm({
+  //       onSubmit: addTodo,
+  //     }),
+  //     Todo({
+  //       todos: todos,
+  //       completeTodo: completeTodo,
+  //       removeTodo: removeTodo,
+  //       updateTodo: updateTodo,
+  //     })
+  //   ]
+  // })
 }
 
 export default TodoList
